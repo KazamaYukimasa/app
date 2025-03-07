@@ -481,43 +481,52 @@ const Others = () => (
   </div>
 );
 
+// ナビゲーションリンクコンポーネント
+const NavigationLinks = () => {
+  const location = useLocation();
+  const links = [
+    { path: '/', label: '案件一覧' },
+    { path: '/government-survey', label: '役所調査表/重要事項説明書' },
+    { path: '/building-confirmation', label: '建築確認申請書' },
+    { path: '/plan-change', label: '計画変更/着工時' },
+    { path: '/others', label: 'その他' }
+  ];
+
+  return (
+    <div style={{ marginTop: '30px' }}>
+      {links.map(({ path, label }) => (
+        <Link
+          key={path}
+          to={path}
+          style={{
+            display: 'block',
+            padding: '12px 15px',
+            margin: '8px 0',
+            textDecoration: 'none',
+            color: location.pathname === path ? '#FF8E3C' : '#666',
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            backgroundColor: location.pathname === path ? '#FFE5D6' : 'transparent'
+          }}
+        >
+          {label}
+        </Link>
+      ))}
+    </div>
+  );
+};
+
 // メインのアプリケーションコンポーネント
 function App() {
-  // ナビゲーションリンクコンポーネント
-  const NavigationLinks = () => {
-    const location = useLocation();
-    const links = [
-      { path: '/', label: '案件一覧' },
-      { path: '/government-survey', label: '役所調査表/重要事項説明書' },
-      { path: '/building-confirmation', label: '建築確認申請書' },
-      { path: '/plan-change', label: '計画変更/着工時' },
-      { path: '/others', label: 'その他' }
-    ];
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+}
 
-    return (
-      <div style={{ marginTop: '30px' }}>
-        {links.map(({ path, label }) => (
-          <Link
-            key={path}
-            to={path}
-            style={{
-              display: 'block',
-              padding: '12px 15px',
-              margin: '8px 0',
-              textDecoration: 'none',
-              color: location.pathname === path ? '#FF8E3C' : '#666',
-              borderRadius: '8px',
-              transition: 'all 0.3s ease',
-              backgroundColor: location.pathname === path ? '#FFE5D6' : 'transparent'
-            }}
-          >
-            {label}
-          </Link>
-        ))}
-      </div>
-    );
-  };
-
+// メインコンテンツコンポーネント
+function AppContent() {
   // 状態管理
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
@@ -649,13 +658,4 @@ function App() {
   );
 }
 
-// アプリケーションのルートコンポーネント
-const Root = () => {
-  return (
-    <Router>
-      <App />
-    </Router>
-  );
-};
-
-export default Root;
+export default App;
