@@ -587,61 +587,30 @@ function App() {
         }}>
           <Logo />
           <div style={{ marginTop: '30px' }}>
-            <Link to="/" style={{
-              display: 'block',
-              padding: '12px 15px',
-              margin: '8px 0',
-              textDecoration: 'none',
-              color: '#666',
-              borderRadius: '8px',
-              transition: 'all 0.3s ease'
-            }}>
-              案件一覧
-            </Link>
-            <Link to="/government-survey" style={{
-              display: 'block',
-              padding: '12px 15px',
-              margin: '8px 0',
-              textDecoration: 'none',
-              color: '#666',
-              borderRadius: '8px',
-              transition: 'all 0.3s ease'
-            }}>
-              役所調査表/重要事項説明書
-            </Link>
-            <Link to="/building-confirmation" style={{
-              display: 'block',
-              padding: '12px 15px',
-              margin: '8px 0',
-              textDecoration: 'none',
-              color: '#666',
-              borderRadius: '8px',
-              transition: 'all 0.3s ease'
-            }}>
-              建築確認申請書
-            </Link>
-            <Link to="/plan-change" style={{
-              display: 'block',
-              padding: '12px 15px',
-              margin: '8px 0',
-              textDecoration: 'none',
-              color: '#666',
-              borderRadius: '8px',
-              transition: 'all 0.3s ease'
-            }}>
-              計画変更/着工時
-            </Link>
-            <Link to="/others" style={{
-              display: 'block',
-              padding: '12px 15px',
-              margin: '8px 0',
-              textDecoration: 'none',
-              color: '#666',
-              borderRadius: '8px',
-              transition: 'all 0.3s ease'
-            }}>
-              その他
-            </Link>
+            {[
+              { path: '/', label: '案件一覧' },
+              { path: '/government-survey', label: '役所調査表/重要事項説明書' },
+              { path: '/building-confirmation', label: '建築確認申請書' },
+              { path: '/plan-change', label: '計画変更/着工時' },
+              { path: '/others', label: 'その他' }
+            ].map(({ path, label }) => (
+              <Link
+                key={path}
+                to={path}
+                style={{
+                  display: 'block',
+                  padding: '12px 15px',
+                  margin: '8px 0',
+                  textDecoration: 'none',
+                  color: window.location.pathname === path ? '#FF8E3C' : '#666',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease',
+                  backgroundColor: window.location.pathname === path ? '#FFE5D6' : 'transparent'
+                }}
+              >
+                {label}
+              </Link>
+            ))}
           </div>
         </nav>
 
