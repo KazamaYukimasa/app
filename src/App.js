@@ -62,7 +62,7 @@ const Modal = ({ isOpen, onClose, children }) => {
 };
 
 // 案件詳細コンポーネント
-const ApplicationDetail = ({ application, onAddComment, onClose }) => {
+const ApplicationDetail = ({ application, onAddComment, onClose, getStatusStyle }) => {
   const [newComment, setNewComment] = useState('');
   const commentInputRef = useRef(null);
 
