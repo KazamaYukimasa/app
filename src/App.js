@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 
@@ -13,7 +13,243 @@ const Logo = () => (
 );
 
 // メインコンテンツコンポーネント
-const MainContent = ({ searchTerm, setSearchTerm, activeTab, setActiveTab, applications, addComment, filteredApplications, getStatusStyle }) => (
+// モーダルコンポーネント
+const Modal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000
+    }}>
+      <div style={{
+        backgroundColor: '#FFF',
+        padding: '30px',
+        borderRadius: '12px',
+        maxWidth: '800px',
+        width: '90%',
+        maxHeight: '90vh',
+        overflow: 'auto',
+        position: 'relative'
+      }}>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '15px',
+            right: '15px',
+            border: 'none',
+            background: 'none',
+            fontSize: '24px',
+            cursor: 'pointer',
+            color: '#666'
+          }}
+        >
+          ×
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+// 案件詳細コンポーネント
+const ApplicationDetail = ({ application, onAddComment, onClose }) => {
+  const [newComment, setNewComment] = useState('');
+  const commentInputRef = useRef(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (newComment.trim()) {
+      onAddComment(application.id, newComment.trim());
+      setNewComment('');
+      if (commentInputRef.current) {
+        commentInputRef.current.focus();
+      }
+    }
+  };
+
+  return (
+    <div>
+      <h2 style={{ 
+        fontSize: '24px',
+        color: '#333',
+        marginBottom: '20px'
+      }}>
+        {application.projectName}
+      </h2>
+
+      <div style={{
+        backgroundColor: '#F9F9F9',
+        padding: '20px',
+        borderRadius: '8px',
+        marginBottom: '20px'
+      }}>
+        <div style={{ marginBottom: '15px' }}>
+          <p style={{ margin: '0 0 10px 0', fontSize: '15px' }}>
+            <strong>場所:</strong> {application.location}
+          </p>
+          <p style={{ margin: '0 0 10px 0', fontSize: '15px' }}>
+            <strong>ID:</strong> {application.id}
+          </p>
+          <p style={{ margin: '0 0 10px 0', fontSize: '15px' }}>
+            <strong>提出日:</strong> {application.submitDate}
+          </p>
+          <p style={{ margin: '0 0 10px 0', fontSize: '15px' }}>
+            <strong>最終更新:</strong> {application.lastUpdate}
+          </p>
+        </div>
+
+        <div style={{ 
+          display: 'flex',
+          gap: '10px',
+          flexWrap: 'wrap'
+        }}>
+          <span style={{
+            padding: '6px 12px',
+            borderRadius: '20px',
+            fontSize: '14px',
+            fontWeight: '500',
+            ...getStatusStyle(application.status)
+          }}>
+            {application.status}
+          </span>
+          <span style={{
+            backgroundColor: application.urgency === '高' ? '#FFE5D6' : 
+                          application.urgency === '中' ? '#FFF0D6' : '#E6F2EA',
+            color: application.urgency === '高' ? '#D95E26' : 
+                   application.urgency === '中' ? '#B87A2B' : '#2D5A27',
+            padding: '6px 12px',
+            borderRadius: '20px',
+            fontSize: '14px'
+          }}>
+            緊急度: {application.urgency}
+          </span>
+        </div>
+      </div>
+
+      <div style={{ marginTop: '30px' }}>
+        <h3 style={{ 
+          fontSize: '18px',
+          color: '#333',
+          marginBottom: '15px',
+          paddingBottom: '10px',
+          borderBottom: '2px solid #FFE5D6'
+        }}>
+          コメント履歴
+        </h3>
+
+        <div style={{ 
+          maxHeight: '300px',
+          overflowY: 'auto',
+          marginBottom: '20px'
+        }}>
+          {application.comments.map(comment => (
+            <div 
+              key={comment.id}
+              style={{
+                backgroundColor: '#F9F9F9',
+                padding: '15px',
+                borderRadius: '8px',
+                marginBottom: '10px'
+              }}
+            >
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '8px',
+                color: '#666',
+                fontSize: '14px'
+              }}>
+                <span style={{ color: '#FF8E3C' }}>{comment.user}</span>
+                <span>{comment.date}</span>
+              </div>
+              <p style={{ 
+                margin: '0',
+                fontSize: '15px',
+                color: '#333',
+                lineHeight: '1.5'
+              }}>
+                {comment.text}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ 
+          backgroundColor: '#F9F9F9',
+          padding: '20px',
+          borderRadius: '8px'
+        }}>
+          <textarea
+            ref={commentInputRef}
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="コメントを入力..."
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #FFB686',
+              borderRadius: '8px',
+              fontSize: '14px',
+              minHeight: '100px',
+              resize: 'vertical',
+              marginBottom: '10px'
+            }}
+          />
+          <div style={{ 
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '10px'
+          }}>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                padding: '10px 20px',
+                border: '1px solid #FFB686',
+                borderRadius: '6px',
+                backgroundColor: '#FFF',
+                color: '#FF8E3C',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              キャンセル
+            </button>
+            <button
+              type="submit"
+              style={{
+                padding: '10px 20px',
+                border: 'none',
+                borderRadius: '6px',
+                backgroundColor: '#FF8E3C',
+                color: '#FFF',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              送信
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const MainContent = ({ searchTerm, setSearchTerm, activeTab, setActiveTab, applications, addComment, filteredApplications, getStatusStyle }) => {
+  const [selectedApp, setSelectedApp] = useState(null);
+
+  return (
   <div style={{ padding: '20px' }}>
     <h1 style={{ 
       margin: 0,
@@ -92,7 +328,9 @@ const MainContent = ({ searchTerm, setSearchTerm, activeTab, setActiveTab, appli
       {filteredApplications.map(app => (
         <div
           key={app.id}
+          onClick={() => setSelectedApp(app)}
           style={{
+            cursor: 'pointer',
             backgroundColor: '#FFF',
             borderRadius: '12px',
             padding: '20px',
@@ -196,6 +434,21 @@ const MainContent = ({ searchTerm, setSearchTerm, activeTab, setActiveTab, appli
         </div>
       ))}
     </div>
+
+    {/* モーダル */}
+    <Modal
+      isOpen={selectedApp !== null}
+      onClose={() => setSelectedApp(null)}
+    >
+      {selectedApp && (
+        <ApplicationDetail
+          application={selectedApp}
+          onAddComment={addComment}
+          onClose={() => setSelectedApp(null)}
+          getStatusStyle={getStatusStyle}
+        />
+      )}
+    </Modal>
   </div>
 );
 
